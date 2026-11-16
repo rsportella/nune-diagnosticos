@@ -1,0 +1,11 @@
+# Segredos e dados pessoais (LGPD): nunca versionar
+config/*
+!config/.htaccess
+
+# Cache de respostas da SerpApi
+cache/*
+!cache/.htaccess
+
+# Sistema
+.DS_Store
+*.bak

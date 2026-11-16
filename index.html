@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diagnóstico GMN · JN Tráfego Pago</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="icone-jn.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Descubra a nota do seu Google Meu Negócio de 0 a 100 e quem aparece na sua frente no mapa. Diagnóstico gratuito da JN Tráfego Pago.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="JN Tráfego Pago">
+<meta property="og:title" content="Diagnóstico do Google Meu Negócio · JN Tráfego Pago">
+<meta property="og:description" content="Descubra a nota do seu perfil de 0 a 100 e quem aparece na sua frente no mapa.">
+<meta property="og:url" content="https://app.nunesjadersontrafegopago.com.br/diagnostico/">
+<meta property="og:image" content="https://app.nunesjadersontrafegopago.com.br/diagnostico/og-diagnostico.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Righteous&family=Montserrat:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#f4f3ef;--surface:#fff;--ink:#2e2e2e;--muted:#6b6a66;--line:#dcdad3;--graf:#4D4D4D;--gold:#FFD053;--gold-ink:#7a5a00;--ok:#2f8a4f;--warn:#c07a00;--bad:#c0392b;--display:"Righteous",system-ui,sans-serif;--body:"Montserrat",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#262626;--surface:#323232;--ink:#f1efe8;--muted:#b3b0a6;--line:#4a4a4a;--graf:#1d1d1d;--gold-ink:#FFD053;--ok:#5cc884;--warn:#f0b54a;--bad:#ff7b6b;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--body)}
+.top{background:var(--graf);color:#fff;padding:18px max(16px,env(safe-area-inset-left))}
+.top .in{max-width:1180px;margin:0 auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.top .in{gap:18px}
+.logo{height:52px;width:auto;display:block}
+.sep{width:1px;align-self:stretch;background:#6a6a6a}
+@media (max-width:560px){.sep{display:none}.logo{height:42px}}
+.top h1{margin:0;font:400 22px var(--display);color:#FFD053}.top p{margin:0;font-size:13px;color:#e8e6df}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.card h2,.card h3{margin:0 0 10px;font:400 17px var(--display)}
+.busca{display:grid;grid-template-columns:2fr 1.2fr 1.8fr auto;gap:10px;align-items:end}
+.busca.dados{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:8px}
+@media (max-width:860px){.busca,.busca.dados{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.busca,.busca.dados{grid-template-columns:1fr}}
+label{display:grid;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+button{font:700 14px var(--body);background:var(--gold);color:#2e2e2e;border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.lista{display:grid;gap:8px}
+.cand{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.cand small{color:var(--muted)}
+.msg{color:var(--muted)}.erro{color:var(--bad);font-weight:600}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+.score{background:var(--graf);color:#fff;border-radius:12px;padding:18px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.ring{width:124px;height:124px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#FFD053 calc(var(--p)*1%),#555 0)}
+.ring div{width:96px;height:96px;border-radius:50%;background:var(--graf);display:grid;place-items:center;text-align:center}
+.ring strong{font:400 38px/1 var(--display);color:#FFD053}.ring span{font-size:11px;color:#ddd}
+.score{grid-template-columns:auto minmax(0,1fr) minmax(0,300px)}
+@media (max-width:860px){.score{grid-template-columns:auto minmax(0,1fr)}.selo{grid-column:1/-1}}
+.selo{background:#2a2a2a;border:1px solid #555;border-radius:10px;padding:12px 14px;color:#e2e0d8;font-size:13px;display:grid;gap:4px}
+.selo .k{color:#FFD053;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.selo .big{font:400 26px/1.1 var(--display);color:#fff}
+.score h2{margin:0 0 4px;font:400 19px var(--display);color:#fff}.score p{margin:0;color:#e2e0d8}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.p-bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.p-warn{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.p-ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.p-gold{background:#FFD053;color:#2e2e2e}
+.bloco{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;margin-bottom:10px}
+.bloco .v{font-weight:700;font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;height:8px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gold)}
+ul.l{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.l li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:start;font-size:13px}
+.pts{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.src{font-size:11px;color:var(--muted)}a{color:var(--gold-ink)}
+#mapa{height:340px;border-radius:8px}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:4px 6px}
+td{padding:6px;border-top:1px solid var(--line)}
+.wrapx{overflow-x:auto}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;padding:4px 0}.chk input{width:auto;margin-top:3px}
+.ficha{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:13px}.ficha b{color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <img class="logo" src="logo-jn.png" alt="Jaderson Nunes Tráfego Pago">
+  <div class="sep" aria-hidden="true"></div>
+  <div><h1>Diagnóstico do Google Meu Negócio</h1><p>Dados reais do Google · nota de 0 a 100 pela Central de Ajuda</p></div>
+</div></header>
+
+<main>
+  <section class="card">
+    <form id="fLead">
+    <h2>Descubra a nota do seu Google Meu Negócio</h2>
+    <p class="msg" style="margin-top:0">Preencha seus dados para liberar o diagnóstico gratuito.</p>
+    <div class="busca dados">
+      <label>Seu nome<input id="leadNome" required autocomplete="name"></label>
+      <label>E-mail<input id="leadEmail" type="email" required autocomplete="email"></label>
+      <label>WhatsApp<input id="leadFone" type="tel" required autocomplete="tel" placeholder="(54) 99999-9999"></label>
+    </div>
+    <label class="chk"><input type="checkbox" id="lgpd" required> Autorizo a JN Tráfego Pago a usar estes dados para enviar o diagnóstico e entrar em contato, conforme a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px">
+      <button id="bLead" style="align-self:end">Continuar</button>
+    </div>
+    <p class="msg" id="mLead"></p>
+    </form>
+    <form id="fBusca" hidden>
+    <h2>Encontre a empresa</h2>
+    <p class="msg" style="margin-top:0" id="ola"></p>
+    <div class="busca">
+      <label>Nome da empresa<input id="nome" required></label>
+      <label>Cidade<input id="cidade" required></label>
+      <label>O que o cliente pesquisa no Google (opcional)<input id="palavra" placeholder="ex.: cirurgião plástico, colchão, dentista"></label>
+      <button id="bBuscar">Buscar no Google</button>
+    </div>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="ecom"> É e-commerce (vende pelo Brasil todo, sem atendimento numa cidade): mede a posição do site no Google em 5 capitais em vez do mapa da cidade</label>
+    </form>
+    <p class="msg" id="mBusca" hidden>Cada diagnóstico usa cerca de 12 consultas ao Google. Buscas repetidas em 3 dias não gastam de novo.</p>
+    <div class="lista" id="lista"></div>
+  </section>
+
+  <div id="laudo" hidden>
+    <section class="score">
+      <div class="ring" id="ring" style="--p:0"><div><strong id="total">0</strong><span>de 100</span></div></div>
+      <div><p class="src" style="color:#FFD053;margin:0;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Saúde do perfil</p><h2 id="titulo"></h2><p id="leitura"></p><p id="parcial" class="src" style="color:#e2e0d8;margin-top:6px"></p></div>
+      <div id="selo" class="selo"></div>
+    </section>
+
+    <div class="grid2" style="margin-top:18px">
+      <div style="display:grid;gap:18px;min-width:0">
+        <section class="card"><h3>Nota por bloco</h3><div id="blocos"></div></section>
+        <section class="card"><h3>Alertas de política</h3><ul class="l" id="alertas"></ul></section>
+        <section class="card"><h3>O que fazer, por impacto</h3><ul class="l" id="acoes"></ul></section>
+      </div>
+      <div style="display:grid;gap:18px;min-width:0">
+        <section class="card"><h3 id="tMapa">Posição no mapa</h3><div id="mapa"></div><div id="nacional" class="wrapx" hidden></div>
+          <div class="leg" id="legMapa"><span><i class="dot" style="background:#2f8a4f"></i>1º a 3º</span><span><i class="dot" style="background:#e0a800"></i>4º a 10º</span><span><i class="dot" style="background:#c0392b"></i>fora do top 10 / não aparece</span></div>
+          <p class="src">A distância de quem busca também pesa e não entra na nota. A posição final é sempre decisão do Google.</p></section>
+        <section class="card"><h3>Concorrentes que aparecem na frente</h3><div class="wrapx" id="conc"></div></section>
+        <section class="card"><h3>Ficha lida do Google</h3><div class="ficha" id="ficha"></div></section>
+        <section class="card"><h3>Avaliações mais recentes</h3><div class="wrapx" id="avals"></div></section>
+        <section class="card"><h3>Confirmar à mão</h3><p class="src" style="margin-top:0">O Google não expõe estes itens publicamente. Marque o que o perfil tem: a nota atualiza.</p><div id="manuais"></div></section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const G=id=>"https://support.google.com/business/answer/"+id+"?hl=pt-BR";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let D=null, mapa=null;
+
+async function api(params){
+  const q=new URLSearchParams({...params,adm:ADM});
+  const r=await fetch("api.php?"+q); const j=await r.json().catch(()=>({erro:"Resposta inválida do servidor."}));
+  if(!r.ok||j.erro) throw new Error(j.erro||"Erro "+r.status); return j;
+}
+
+let LID=""; try{LID=sessionStorage.getItem("jn_lid")||""}catch(e){}
+// Link de administrador: ?adm=CHAVE (fica salvo neste navegador)
+let ADM=""; try{ const u=new URLSearchParams(location.search).get("adm"); if(u){localStorage.setItem("jn_adm",u); history.replaceState(null,"",location.pathname)} ADM=localStorage.getItem("jn_adm")||""; }catch(e){}
+if(ADM){ LID="admin"; }
+function irParaBusca(nome){ $("fLead").hidden=true; $("fBusca").hidden=false; $("mBusca").hidden=false; $("ola").textContent=nome?`Olá, ${nome.split(" ")[0]}! Agora digite o nome da empresa e a cidade.`:"Digite o nome da empresa e a cidade."; $("nome").focus(); }
+if(ADM){ irParaBusca(""); $("ola").textContent="Modo administrador (JN): diagnóstico liberado para qualquer empresa."; }
+else if(LID) irParaBusca("");
+$("fLead").addEventListener("submit",async e=>{
+  e.preventDefault();
+  $("bLead").disabled=true; $("mLead").className="msg"; $("mLead").textContent="Salvando…";
+  try{
+    const j=await api({acao:"lead",lead_nome:$("leadNome").value,lead_email:$("leadEmail").value,lead_fone:$("leadFone").value,lgpd:$("lgpd").checked?"1":"0"});
+    LID=j.lid; try{sessionStorage.setItem("jn_lid",LID)}catch(e){}
+    $("mLead").textContent=""; irParaBusca($("leadNome").value);
+  }catch(err){$("mLead").className="erro";$("mLead").textContent=err.message}
+  finally{$("bLead").disabled=false}
+});
+function regraCidade(){ const ec=$("ecom").checked; $("cidade").required=!ec; $("cidade").placeholder=ec?"não precisa (e-commerce)":""; $("cidade").style.opacity=ec?.5:1; }
+$("ecom").addEventListener("change",regraCidade); regraCidade();
+$("fBusca").addEventListener("submit",async e=>{
+  e.preventDefault();
+  $("bBuscar").disabled=true; $("mBusca").className="msg"; $("mBusca").textContent="Buscando no Google…"; $("lista").innerHTML="";
+  try{
+    const j=await api({acao:"buscar",nome:$("nome").value,cidade:$("cidade").value,lid:LID,ecommerce:$("ecom").checked?"1":"0"});
+    if(!j.resultados.length){$("mBusca").textContent="Nada encontrado. Confira o nome e a cidade.";return}
+    $("mBusca").textContent="Escolha a empresa certa:";
+    $("lista").innerHTML=j.resultados.map((r,i)=>`<div class="cand"><div><strong>${esc(r.titulo)}</strong><br><small>${esc(r.categoria)} · ${r.nota??"sem nota"} ★ (${r.avaliacoes||0}) · ${esc(r.endereco)}</small></div><button type="button" data-i="${i}">Diagnosticar</button></div>`).join("");
+    $("lista").querySelectorAll("button").forEach(b=>b.onclick=()=>diagnosticar(j.resultados[b.dataset.i],b));
+  }catch(err){$("mBusca").className="erro";$("mBusca").textContent=err.message}
+  finally{$("bBuscar").disabled=false}
+});
+
+async function diagnosticar(c,btn){
+  btn.disabled=true; btn.textContent="Analisando… (até 1 min)";
+  try{
+    D=await api({acao:"diagnostico",data_id:c.data_id,lat:c.lat,lng:c.lng,palavra:$("palavra").value,lid:LID,titulo:c.titulo,cidade:$("cidade").value,ecommerce:$("ecom").checked?"1":"0"});
+    D.manual={}; montarManuais(); render(); $("laudo").hidden=false; if(mapa) setTimeout(()=>{mapa.invalidateSize();mapa.setView([D.lat,D.lng],13)},200); $("laudo").scrollIntoView({behavior:"smooth"});
+  }catch(err){alert(err.message)}finally{btn.disabled=false;btn.textContent="Diagnosticar"}
+}
+
+const MESES={jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11};
+function diasDesde(s){ if(!s) return null;
+  let d=/^\d{4}-\d{2}-\d{2}$/.test(s)?new Date(s+"T12:00:00"):null;
+  if(!d){const m=s.toLowerCase().match(/(\d{1,2}) de (\w{3})\.? de (\d{4})/); if(m&&MESES[m[2]]!=null) d=new Date(+m[3],MESES[m[2]],+m[1]);}
+  return d?Math.max(0,Math.round((Date.now()-d)/864e5)):null;
+}
+
+const MANUAIS=[
+ ["horarioEsp","Horário especial de feriado cadastrado","Cadastro",2,"6303076","Cadastrar o horário dos próximos feriados"],
+ ["chat","Botão de WhatsApp/mensagem ativo","Cadastro",1,"16751381","Ativar o botão de WhatsApp no perfil"],
+ ["atributos","Atributos preenchidos (pagamento, acessibilidade…)","Cadastro",2,"9049526","Preencher os atributos da categoria"],
+ ["servicos","Serviços cadastrados com descrição","Cadastro",3,"9455399","Cadastrar cada serviço com descrição (aparece nas buscas pelo serviço)"],
+ ["logo","Tem logotipo","Fotos",2,"16335217","Adicionar o logotipo"],
+ ["capa","Tem foto de capa","Fotos",2,"16335217","Escolher uma foto de capa"],
+ ["fotoRecente","Subiu foto nos últimos 30 dias","Fotos",4,"10515606","Subir fotos novas todo mês (o Google liga isso à classificação)"],
+ ["nap","Nome, telefone e endereço do site iguais aos do Google","Web",3,"4454429","Deixar nome, telefone e endereço idênticos no site e no Google"],
+ ["redes","Redes sociais vinculadas no perfil","Web",2,"13580646","Vincular Instagram e Facebook no perfil"],
+ ["descricao","Descrição preenchida, sem link/preço/promoção","Conteúdo",5,"3039617","Escrever a descrição: o que faz, diferencial e há quanto tempo existe (até 750 caracteres, sem link nem preço)"],
+];
+function montarManuais(){
+  $("manuais").innerHTML=MANUAIS.map(m=>`<label class="chk"><input type="checkbox" id="m_${m[0]}"> ${m[1]} <span class="pts">(${m[3]} pts)</span></label>`).join("");
+  MANUAIS.forEach(m=>$("m_"+m[0]).onchange=e=>{D.manual[m[0]]=e.target.checked;render()});
+}
+
+const GENERICAS=/^(empresa|loja|serviço|consultoria|comércio|estabelecimento)$/i;
+function calcular(){
+  const it=[]; const add=(b,n,p,m,f,a,auto=true)=>it.push({bloco:b,item:n,pts:Math.max(0,Math.min(m,p)),max:m,fonte:f,acao:a,auto});
+  const cat=D.categorias||[];
+  add("Cadastro","Categoria principal: "+(cat[0]||"nenhuma"),cat[0]&&!GENERICAS.test(cat[0])?6:cat[0]?3:0,6,"7249669","Usar a categoria principal mais específica da lista do Google");
+  add("Cadastro","Categorias adicionais ("+Math.max(0,cat.length-1)+")",cat.length>1?2:0,2,"3038177","Adicionar 1 a 3 categorias secundárias do que a empresa É");
+  const nome=D.nome||""; const caps=nome.length>4&&nome===nome.toUpperCase()&&/[A-ZÀ-Ú]/.test(nome); const sep=/\s[|\-–]\s/.test(nome);
+  add("Cadastro","Nome dentro da diretriz",caps?0:sep?2:4,4,"3038177",sep?"Conferir se o trecho depois do separador está na fachada; se não, tirar do nome":"Corrigir o nome para o usado na fachada");
+  add("Cadastro","Endereço",D.endereco?4:0,4,"2853879","Completar o endereço oficial ou a área de cobertura");
+  add("Cadastro","Horário de funcionamento",D.horario?4:0,4,"3038177","Preencher o horário normal");
+  add("Cadastro","Telefone",D.telefone?2:0,2,"16750496","Adicionar telefone local");
+  // Avaliações
+  const nota=+D.nota||0, qtd=+D.total_avaliacoes||0;
+  add("Avaliações",`Nota média (${nota.toFixed(1)})`,qtd===0?0:nota>=4.7?10:nota>=4.5?8:nota>=4.2?5:nota>=4?2:0,10,"4454429","Aumentar o volume de avaliações de clientes satisfeitos");
+  // Saúde do perfil: volume por régua fixa (a comparação com concorrentes fica no quadro de Concorrência)
+  add("Avaliações",`Quantidade de avaliações (${qtd})`,qtd>=50?10:qtd>=25?7:qtd>=10?4:qtd>=1?2:0,10,"4454429","Pedir avaliação a todo cliente com link/QR (sem brinde e sem filtrar só os satisfeitos)");
+  const av=D.avaliacoes||[]; const dA=av.length?diasDesde(av[0].data):null;
+  add("Avaliações",dA==null?"Avaliações recentes (sem dados)":`Última avaliação há ${dA} dias`,dA==null?0:dA<=30?5:dA<=90?3:dA<=180?1:0,5,"3474122","Manter avaliações entrando todo mês");
+  const neg=av.filter(r=>r.nota!=null&&r.nota<=3); const rec=av.slice(0,5);
+  let pr, desc;
+  if(neg.length){const t=neg.filter(r=>r.respondida).length/neg.length; pr=t>=1?5:t>0?2:0; desc=`Resposta às negativas (${neg.filter(r=>r.respondida).length}/${neg.length})`}
+  else {const t=rec.length?rec.filter(r=>r.respondida).length/rec.length:0; pr=t>=.5?5:t>0?3:2; desc=`Respostas nas últimas ${rec.length} avaliações (${rec.filter(r=>r.respondida).length}/${rec.length})`}
+  add("Avaliações",desc,pr,5,"3474122","Responder as avaliações recentes, sempre as negativas, rápido e sem dados pessoais");
+  // Fotos
+  const f=+D.fotos||0;
+  add("Fotos",`Fotos no perfil (${f}${D.fotos_mais?"+":""})`,D.fotos_mais?12:Math.round(Math.min(1,f/12)*12),12,"6123536","Subir pelo menos 3 fotos de cada: fachada, por dentro, serviço e equipe");
+  // Web
+  const site=(D.site||"").toLowerCase(); const naoProprio=/instagram\.com|facebook\.com|wa\.me|linktr\.ee|tiktok\.com|docs\.google|forms\.gle|google\.com\/forms|drive\.google/.test(site);
+  add("Web",site?(naoProprio?"Site do perfil não é site próprio":"Site próprio no perfil"):"Sem site no perfil",site&&!naoProprio?5:0,5,"3038177",naoProprio?"Trocar o link (rede social/formulário) por um site próprio":"Colocar um site próprio no perfil");
+  // Conteúdo
+  const dP=D.posts&&D.posts.length?diasDesde(D.posts[0].data):null;
+  add("Conteúdo",dP==null?"Nenhum post encontrado":`Último post há ${dP} dias`,dP==null?0:dP<=30?5:dP<=90?3:dP<=180?1:0,5,"7342169","Postar pelo menos 1 vez por mês (post com 6+ meses é arquivado)");
+  // Itens que agora podem vir automáticos (quando há dado confiável); senão, ficam pra confirmar à mão
+  const auto={};
+  if(D.painel_ok){ const d=D.descricao||""; const ruim=/https?:\/\/|www\.|r\$\s?\d|\d+\s?%|desconto|promo/i.test(d)||d.length>750;
+    auto.descricao={pts:d.length>=80&&!ruim?5:d?2:0,item:d?(ruim?"Descrição fora da regra (link, preço ou promoção)":"Descrição \"Da empresa\" preenchida"):"Sem descrição \"Da empresa\""};
+    auto.redes={pts:(D.redes||[]).length?2:0,item:(D.redes||[]).length?"Redes no perfil: "+D.redes.map(r=>r.nome).join(", "):"Nenhuma rede social vinculada ao perfil"}; }
+  if(D.site_check&&D.site_check.abre){ const s=D.site_check; auto.nap={pts:(s.telefone_no_site?2:0)+(s.nome_no_site?1:0),item:`No site: telefone ${s.telefone_no_site?"✓":"✗"} · nome ${s.nome_no_site?"✓":"✗"}`};
+    if(!auto.redes||!auto.redes.pts){ if(s.instagram||s.facebook) auto.redes={pts:1,item:"Redes só no site (não vinculadas ao perfil)"} } }
+  if((D.atributos||[]).length) auto.atributos={pts:2,item:`Atributos encontrados (${D.atributos.length})`};
+  MANUAIS.forEach(m=>{ const a=auto[m[0]]; if(a){ const el=$("m_"+m[0]); const cheio=a.pts>=m[3];
+      if(cheio){ add(m[2],a.item,a.pts,m[3],m[4],m[5],true); if(el){el.checked=true;el.disabled=true;el.parentElement.title="Confirmado automaticamente pelo Google";} }
+      else { const manual=!!D.manual[m[0]]; add(m[2],a.item+(manual?" · confirmado à mão":""),manual?m[3]:a.pts,m[3],m[4],m[5],!manual);
+        if(el){el.disabled=false;el.checked=manual;el.parentElement.title="O Google não mostrou este item completo: marque se o perfil tem";} } }
+    else add(m[2],m[1],D.manual[m[0]]?m[3]:0,m[3],m[4],m[5],false); });
+  // Alertas
+  const al=[]; let teto=100; const A=(c,t,cap,f)=>{if(c){al.push({t,cap,f});teto=Math.min(teto,cap)}};
+  A(D.nao_reivindicado,"Perfil não reivindicado: qualquer pessoa pode tentar assumir",50,"14509283");
+  A(D.temporariamente_fechado,"Marcado como temporariamente fechado: cai nas buscas",50,"15300196");
+  A(caps,"Nome todo em maiúsculas: fora da diretriz",80,"3038177");
+  A(naoProprio,"Site do perfil não é site próprio (rede social ou formulário)",85,"3038177");
+  if(D.ecommerce) al.push({t:"Perfil da Empresa é só para quem atende cliente presencialmente (loja, entrega ou serviço numa região). Empresa só on-line não é elegível e pode ter o perfil suspenso: confirme se há atendimento local ou use o Perfil da Marca",cap:null,f:"13763036"});
+  const datas=av.map(r=>r.data).filter(Boolean).sort(); let pico=false;
+  for(let i=0;i+4<datas.length;i++){ if((new Date(datas[i+4])-new Date(datas[i]))/864e5<=7) pico=true }
+  if(pico) al.push({t:"5 ou mais avaliações em 7 dias. Tudo bem se vieram de clientes reais; o Google só pune incentivo (brinde, desconto) ou avaliação falsa",cap:null,f:"7400114"});
+  if(D.centro_por_cidade) al.push({t:`Endereço oculto (atende por área de cobertura): o mapa foi centralizado em ${D.cidade}`,cap:null,f:"3038163"});
+  const soma=it.reduce((s,i)=>s+i.pts,0); const pend=it.filter(i=>!i.auto&&!i.pts).reduce((s,i)=>s+i.max,0);
+  return {it,al,teto,soma:Math.round(soma),total:Math.round(Math.min(soma,teto)),pend};
+}
+
+// Quadro de Concorrência: comparação relativa, separada da nota de saúde
+function seloConcorrencia(){
+  const qtd=+D.total_avaliacoes||0;
+  if(D.nacional){ const N=D.nacional, RF=N.ranking_forca||[]; const i=RF.findIndex(x=>x.voce);
+    const acima=i>0?RF[i-1]:(N.pos_forca>1&&RF.length?RF[RF.length-1]:null);
+    const falta=acima?Math.max(0,acima.avaliacoes-qtd+1):0;
+    return `<span class="k">Concorrência · Brasil</span><span class="big">${N.pos_forca?N.pos_forca+"º de "+N.total_forca:"–"}</span>
+      <span>no ranking do nicho "${esc(N.palavra)}" (nota × avaliações)</span>
+      <span>Site no Google: ${N.aparece_em?`aparece em ${N.aparece_em}/5 capitais (posição média: ${String(N.media).replace(".",",")})`:"não aparece no top 20 das capitais"}</span>
+      ${acima&&falta?`<span>Faltam <b>${falta}</b> avaliações pra passar ${esc(acima.titulo)}</span>`:""}`; }
+  const pts=(D.grade?.pontos||[]).map(p=>p.pos); const top3=pts.filter(p=>p&&p<=3).length, apar=pts.filter(Boolean).length;
+  const centro=(D.grade?.pontos||[])[4]?.pos;
+  const frente=(D.concorrentes||[]).filter(c=>c.posicao!=null&&(!centro||c.posicao<centro)).sort((a,b)=>a.posicao-b.posicao);
+  const alvo=frente.length?frente[frente.length-1]:null; const falta=alvo?Math.max(0,(+alvo.avaliacoes||0)-qtd+1):0;
+  return `<span class="k">Concorrência · ${esc(D.cidade||"região")}</span><span class="big">${centro?centro+"º":"fora do top 20"}</span>
+    <span>no centro do mapa · top 3 em ${top3} de ${pts.length} pontos${apar<pts.length?` · some em ${pts.length-apar}`:""}</span>
+    ${alvo&&falta?`<span>Faltam <b>${falta}</b> avaliações pra igualar ${esc(alvo.titulo)} (${alvo.posicao}º)</span>`:(centro===1?"<span>Líder no centro do mapa 🏆</span>":"")}`;
+}
+function cor(p){return p&&p<=3?"#2f8a4f":p&&p<=10?"#e0a800":"#c0392b"}
+function render(){
+  const r=calcular();
+  $("total").textContent=r.total; $("ring").style.setProperty("--p",r.total);
+  $("titulo").textContent=D.nome+" · "+r.total+"/100";
+  $("leitura").textContent=r.total>=80?"Perfil forte. Ajustes finos pra ficar à frente.":r.total>=60?"Perfil razoável, com pontos claros pra subir.":r.total>=40?"Perfil fraco: perde clientes pra concorrência no mapa.":"Perfil abandonado ou em risco. Precisa de trabalho urgente.";
+  $("selo").innerHTML=seloConcorrencia();
+  $("parcial").textContent=(r.pend?`${r.pend} pontos dependem de confirmação manual (quadro "Confirmar à mão"). `:"")+(r.teto<100&&r.soma>r.teto?`Somou ${r.soma}, travado em ${r.teto} por alerta.`:"");
+  const ord=["Cadastro","Avaliações","Fotos","Web","Conteúdo"], nm={Cadastro:"Cadastro e relevância",Avaliações:"Avaliações",Fotos:"Fotos e vídeos",Web:"Presença na web",Conteúdo:"Conteúdo"};
+  $("blocos").innerHTML=ord.map(b=>{const x=r.it.filter(i=>i.bloco===b),p=x.reduce((s,i)=>s+i.pts,0),m=x.reduce((s,i)=>s+i.max,0);return `<div class="bloco"><span>${nm[b]}</span><span class="v">${Math.round(p)}/${m}</span><span class="bar"><i style="width:${p/m*100}%"></i></span></div>`}).join("");
+  $("alertas").innerHTML=r.al.length?r.al.map(a=>`<li>${a.cap?`<span class="pill p-bad">teto ${a.cap}</span>`:`<span class="pill p-warn">atenção</span>`}<span>${a.t} <a class="src" target="_blank" rel="noopener" href="${G(a.f)}">fonte</a></span><span></span></li>`).join(""):`<li><span class="pill p-ok">ok</span><span>Nenhum alerta encontrado.</span><span></span></li>`;
+  const f=r.it.filter(i=>i.pts<i.max).sort((a,b)=>(b.max-b.pts)-(a.max-a.pts));
+  $("acoes").innerHTML=f.map(i=>{const g=i.max-i.pts,c=g>=5?"p-bad":g>=2?"p-warn":"p-ok";return `<li><span class="pill ${c}">+${Math.round(g)}</span><span>${esc(i.acao)}<br><span class="src">${esc(i.item)}${i.auto?"":" · confirmar à mão"} · <a target="_blank" rel="noopener" href="${G(i.fonte)}">Central do Google</a></span></span><span class="pts">${Math.round(i.pts)}/${i.max}</span></li>`}).join("")||"<li>Tudo no máximo.</li>";
+  // mapa (local) ou ranking Brasil (e-commerce)
+  const N=D.nacional;
+  $("mapa").hidden=!!N; $("legMapa").hidden=!!N; $("nacional").hidden=!N;
+  if(N){
+    $("tMapa").textContent=`Posição no Google Brasil · "${N.palavra}"`;
+    const pc=p=>p?`<span class="pill ${p<=3?"p-ok":p<=10?"p-warn":"p-bad"}">${p}º</span>`:`<span class="pill p-bad">não aparece</span>`;
+    $("nacional").innerHTML=(N.dominio?`<p class="src" style="margin-top:0">Site medido: <b>${esc(N.dominio)}</b> · aparece em ${N.aparece_em} de ${N.cidades.length} capitais${N.media?` · posição média: ${String(N.media).replace(".",",")}`:""} · Google Shopping: ${N.shopping?"aparece":"não aparece"}</p>`:`<p class="erro" style="margin-top:0">O perfil não tem site cadastrado, então não dá pra medir a posição na Pesquisa.</p>`)+
+      `<table><thead><tr><th>Capital</th><th>Posição do site</th><th>Quem está em 1º</th></tr></thead><tbody>${N.cidades.map(c=>`<tr><td>${esc(c.cidade)}</td><td>${pc(c.pos)}</td><td>${esc((c.top3[0]||{}).site||"–")}</td></tr>`).join("")}</tbody></table>`;
+    const RF=N.ranking_forca||[];
+    const rk=RF.length>1?`<p class="src" style="margin-top:14px">Ranking por pontuação no Google (nota × volume de avaliações) entre ${N.total_forca} empresas do nicho que aparecem nas 5 capitais. <b>${esc(D.nome)} fica em ${N.pos_forca}º.</b></p>
+      <table><thead><tr><th>#</th><th>Empresa</th><th>Nota</th><th>Avaliações</th><th>Capital</th></tr></thead><tbody>${RF.map((r,i)=>`<tr${r.voce?' style="font-weight:700"':""}><td>${i+1}º</td><td>${esc(r.titulo)}${r.voce?" (você)":""}</td><td>${r.nota}</td><td>${r.avaliacoes}</td><td>${esc(r.cidade||"–")}</td></tr>`).join("")}${N.pos_forca>RF.length?`<tr style="font-weight:700"><td>${N.pos_forca}º</td><td>${esc(D.nome)} (você)</td><td>${D.nota}</td><td>${D.total_avaliacoes}</td><td>–</td></tr>`:""}</tbody></table>`:"";
+    $("conc").innerHTML=rk+`<p class="src" style="margin-top:14px">Sites que mais aparecem no top 5 das 5 capitais:</p><table><thead><tr><th>Site</th><th>Capitais</th><th>Posição média</th></tr></thead><tbody>${(N.lideres||[]).map(l=>`<tr><td>${esc(l.site)}<br><span class="src">${esc(l.titulo)}</span></td><td>${l.cidades}/5</td><td>${String(l.media).replace(".",",")}</td></tr>`).join("")}</tbody></table>`;
+  } else {
+  $("tMapa").textContent=`Posição no mapa · "${D.grade.palavra}"`;
+  if(window.L){ if(mapa) mapa.remove(); mapa=L.map("mapa",{scrollWheelZoom:false}).setView([D.lat,D.lng],13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(mapa);
+    D.grade.pontos.forEach(p=>L.marker([p.lat,p.lng],{icon:L.divIcon({className:"",html:`<div style="width:34px;height:34px;border-radius:50%;background:${cor(p.pos)};color:#fff;font:700 13px Montserrat,sans-serif;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 1px 4px #0006">${p.pos?p.pos+"º":"–"}</div>`,iconSize:[34,34],iconAnchor:[17,17]})}).addTo(mapa));
+  }
+  $("conc").innerHTML=`<table><thead><tr><th>Posição no centro</th><th>Empresa</th><th>Nota</th><th>Avaliações</th></tr></thead><tbody>${(D.concorrentes||[]).map(c=>`<tr><td>${c.posicao??""}º</td><td>${esc(c.titulo)}</td><td>${c.nota??"–"}</td><td>${c.avaliacoes||0}</td></tr>`).join("")}<tr><td>${(D.grade.pontos[4]||{}).pos??"–"}º</td><td><b>${esc(D.nome)} (você)</b></td><td>${D.nota??"–"}</td><td>${D.total_avaliacoes||0}</td></tr></tbody></table>`;
+  }
+  const h=D.horario?D.horario.map(o=>Object.entries(o)[0].join(": ").replace(/_/g,"-")).join(" · "):"não informado";
+  $("ficha").innerHTML=[["Nome",D.nome],["Categorias",(D.categorias||[]).join(", ")],["Endereço",D.endereco],["Telefone",D.telefone],["Site",D.site],["Horário",h],["Fotos",D.fotos+(D.fotos_mais?"+":"")],["Posts",(D.posts||[]).map(p=>p.data).join(", ")||"nenhum"],["Redes",(D.redes||[]).map(r=>r.nome).join(", ")||(D.painel_ok?"nenhuma no perfil":"não lido")],["Descrição",D.descricao||(D.painel_ok?"sem descrição":"não lida")]].map(([k,v])=>`<b>${k}</b><span style="overflow-wrap:anywhere">${esc(v||"–")}</span>`).join("");
+  $("avals").innerHTML=`<table><thead><tr><th>Data</th><th>Nota</th><th>Respondida</th><th>Trecho</th></tr></thead><tbody>${(D.avaliacoes||[]).map(a=>`<tr><td>${esc(a.data)}</td><td>${a.nota??""}</td><td>${a.respondida?'<span class="pill p-ok">sim</span>':'<span class="pill p-warn">não</span>'}</td><td>${esc(a.texto)}</td></tr>`).join("")}</tbody></table>`;
+}
+</script>
+</body>
+</html>

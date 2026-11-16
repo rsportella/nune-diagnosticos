@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "\.(key|txt|json|csv)$">
+  Require all denied
+</FilesMatch>
