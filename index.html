@@ -72,7 +72,7 @@ ul.l{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 ul.l li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:start;font-size:13px}
 .pts{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 .src{font-size:11px;color:var(--muted)}a{color:var(--gold-ink)}
-#mapa{height:340px;border-radius:8px}
+#mapa{height:340px;border-radius:8px;position:relative;z-index:0;isolation:isolate}
 .leg{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
 table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
@@ -81,6 +81,30 @@ td{padding:6px;border-top:1px solid var(--line)}
 .wrapx{overflow-x:auto}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;padding:4px 0}.chk input{width:auto;margin-top:3px}
 .ficha{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:13px}.ficha b{color:var(--muted);font-weight:600}
+.sticky{position:sticky;top:0;z-index:500;transition:padding .2s}
+.sticky.mini{border-radius:0 0 12px 12px;padding:8px 14px;grid-template-columns:auto minmax(0,1fr)}
+.sticky.mini .ring{width:52px;height:52px}.sticky.mini .ring div{width:40px;height:40px}.sticky.mini .ring strong{font-size:17px}.sticky.mini .ring span{display:none}
+.sticky.mini #leitura,.sticky.mini .selo,.sticky.mini #parcial,.sticky.mini .regua{display:none}.sticky.mini h2{font-size:15px;margin:0}
+.minitxt{display:none;font-size:12px;color:#FFD053;font-weight:700;margin:2px 0 0}.sticky.mini .minitxt{display:block}
+.regua{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap}.regua span{font-size:11px;padding:3px 8px;border-radius:99px;background:#3a3a3a;color:#bbb;font-weight:600}.regua span.on{color:#2e2e2e;font-weight:700}
+#rot{font-size:13px;padding:3px 10px;vertical-align:middle;color:#2e2e2e}.ex{box-shadow:0 0 0 2px #fff,0 0 16px #FFD053}
+.secao{margin-top:26px}.secao>.cab{display:flex;gap:12px;align-items:baseline;margin-bottom:12px}
+.secao>.cab .n{font:400 30px/1 var(--display);color:var(--gold-ink)}.secao>.cab h2{margin:0;font:400 22px var(--display)}.secao>.cab p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.acao{border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:8px;background:var(--surface)}
+.acao.feito{opacity:.6}.acao .t{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.acao .t b{font-size:15px}
+.acao dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;margin:0;font-size:13px}.acao dt{color:var(--muted);font-weight:600}.acao dd{margin:0}
+.acao .ja{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600;color:var(--ink)}.acao .ja input{width:auto}
+.acoes{display:grid;gap:10px}.grupo{font:700 11px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 6px}
+.alerta{border-left:4px solid var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--surface));padding:10px 12px;border-radius:6px;font-size:13px;margin-bottom:8px}
+.alerta.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.cofre{position:relative;display:grid;gap:10px}.acao.blur{filter:blur(5px);user-select:none;pointer-events:none}
+.cta{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;text-align:center;padding:20px;background:color-mix(in srgb,var(--bg) 35%,transparent)}
+.cta b{font:400 20px/1.3 var(--display);max-width:520px}.cta span{color:var(--muted);max-width:480px}
+.modal{position:fixed;inset:0;z-index:2000;background:#000a;display:grid;place-items:center;padding:16px}.modal[hidden]{display:none}
+.mbox{background:var(--surface);border-radius:14px;padding:22px;max-width:420px;width:100%;position:relative;border-top:6px solid var(--gold)}
+.fechar{position:absolute;top:10px;right:10px;padding:4px 10px}
+.inclui{margin:0 0 14px;padding-left:18px;font-size:13px;display:grid;gap:4px}
+.preco{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}.preco strong{font:400 30px var(--display)}
 </style>
 </head>
 <body>
@@ -122,36 +146,56 @@ td{padding:6px;border-top:1px solid var(--line)}
   </section>
 
   <div id="laudo" hidden>
-    <section class="score">
+    <section class="score sticky" id="st">
       <div class="ring" id="ring" style="--p:0"><div><strong id="total">0</strong><span>de 100</span></div></div>
-      <div><p class="src" style="color:#FFD053;margin:0;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Saúde do perfil</p><h2 id="titulo"></h2><p id="leitura"></p><p id="parcial" class="src" style="color:#e2e0d8;margin-top:6px"></p></div>
+      <div><p class="src" style="color:#FFD053;margin:0;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Saúde do perfil</p>
+        <h2><span id="rot" class="pill"></span> <span id="titulo"></span></h2><p id="leitura"></p>
+        <div class="regua" id="regua"></div><p class="minitxt" id="minitxt"></p><p id="parcial" class="src" style="color:#e2e0d8;margin-top:6px"></p></div>
       <div id="selo" class="selo"></div>
     </section>
 
-    <div class="grid2" style="margin-top:18px">
+    <div class="secao"><div class="cab"><span class="n">1</span><div><h2>Como você está hoje</h2><p>O retrato do seu perfil, do jeito que o Google mostra.</p></div></div>
+    <div class="grid2">
       <div style="display:grid;gap:18px;min-width:0">
-        <section class="card"><h3>Nota por bloco</h3><div id="blocos"></div></section>
-        <section class="card"><h3>Alertas de política</h3><ul class="l" id="alertas"></ul></section>
-        <section class="card"><h3>O que fazer, por impacto</h3><ul class="l" id="acoes"></ul></section>
+        <section class="card"><h3>Nota por área</h3><div id="blocos"></div></section>
+        <section class="card"><h3>Como os clientes te enxergam no Google</h3><div class="ficha" id="ficha"></div></section>
+        <section class="card"><h3>Avaliações mais recentes</h3><div class="wrapx" id="avals"></div></section>
       </div>
       <div style="display:grid;gap:18px;min-width:0">
         <section class="card"><h3 id="tMapa">Posição no mapa</h3><div id="mapa"></div><div id="nacional" class="wrapx" hidden></div>
           <div class="leg" id="legMapa"><span><i class="dot" style="background:#2f8a4f"></i>1º a 3º</span><span><i class="dot" style="background:#e0a800"></i>4º a 10º</span><span><i class="dot" style="background:#c0392b"></i>fora do top 10 / não aparece</span></div>
           <p class="src">A distância de quem busca também pesa e não entra na nota. A posição final é sempre decisão do Google.</p></section>
-        <section class="card"><h3>Concorrentes que aparecem na frente</h3><div class="wrapx" id="conc"></div></section>
-        <section class="card"><h3>Ficha lida do Google</h3><div class="ficha" id="ficha"></div></section>
-        <section class="card"><h3>Avaliações mais recentes</h3><div class="wrapx" id="avals"></div></section>
-        <section class="card"><h3>Confirmar à mão</h3><p class="src" style="margin-top:0">O Google não expõe estes itens publicamente. Marque o que o perfil tem: a nota atualiza.</p><div id="manuais"></div></section>
+        <section class="card"><h3>Quem aparece na sua frente</h3><div class="wrapx" id="conc"></div></section>
       </div>
+    </div></div>
+
+    <div class="secao"><div class="cab"><span class="n">2</span><div><h2>O que fazer pra subir</h2><p>Do que mais dá ponto pro que menos dá. Marque "Já tenho" no que o Google não mostra publicamente: a nota lá em cima atualiza na hora.</p></div></div>
+      <div class="grupo">Cuidados pra não ter o perfil suspenso</div><div id="alertas"></div>
+      <div class="grupo">Ações</div><div class="acoes" id="acoes"></div>
     </div>
   </div>
 </main>
+<div id="pagar" class="modal" hidden><div class="mbox">
+  <button type="button" class="sec fechar" onclick="$('pagar').hidden=true" aria-label="Fechar">✕</button>
+  <p class="src" style="margin:0;color:var(--gold-ink);text-transform:uppercase;letter-spacing:.08em;font-weight:700">Diagnóstico completo</p>
+  <h2 style="margin:4px 0 8px;font:400 22px var(--display)">Libere o plano completo do seu perfil</h2>
+  <ul class="inclui"><li>Todas as ações, em ordem de impacto, com o passo a passo</li><li>Quanto cada ação soma na sua nota</li><li>Comparação com quem aparece na sua frente no mapa</li><li>PDF pra guardar e seguir</li></ul>
+  <div class="preco"><span class="src">pagamento único</span><strong>R$ X</strong></div>
+  <button type="button" style="width:100%" onclick="PAGO=true;$('pagar').hidden=true;render();$('acoes').scrollIntoView({behavior:'smooth'})">Pagar com Pix ou cartão</button>
+  <p class="src" style="text-align:center;margin:8px 0 0">Pagamento pelo Mercado Pago. Liberação na hora, no e-mail confirmado.</p>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <p style="margin:0;font-size:13px"><b>Prefere que a gente faça por você?</b> A JN Tráfego Pago arruma o perfil inteiro e cuida dele todo mês.</p>
+  <button type="button" class="sec" style="width:100%;margin-top:8px">Falar com a JN no WhatsApp</button>
+  <p class="src" style="text-align:center;margin:8px 0 0">(teste: o pagamento ainda não é cobrado)</p>
+</div></div>
 
 <script>
 const $=id=>document.getElementById(id);
 const G=id=>"https://support.google.com/business/answer/"+id+"?hl=pt-BR";
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let D=null, mapa=null;
+// MODO TESTE (13/11/2026, pedido do Jaderson pra Lidiane testar): o botão de pagar libera direto, sem cobrar. Voltar ao normal antes de vender.
+let PAGO=false;
 
 async function api(params){
   const q=new URLSearchParams({...params,adm:ADM});
@@ -191,6 +235,7 @@ $("fBusca").addEventListener("submit",async e=>{
   finally{$("bBuscar").disabled=false}
 });
 
+addEventListener("scroll",()=>{const st=$("st"),l=$("laudo");if(st&&!l.hidden)st.classList.toggle("mini",scrollY>l.offsetTop+260)});
 async function diagnosticar(c,btn){
   btn.disabled=true; btn.textContent="Analisando… (até 1 min)";
   try{
@@ -209,19 +254,43 @@ function diasDesde(s){ if(!s) return null;
 const MANUAIS=[
  ["horarioEsp","Horário especial de feriado cadastrado","Cadastro",2,"6303076","Cadastrar o horário dos próximos feriados"],
  ["chat","Botão de WhatsApp/mensagem ativo","Cadastro",1,"16751381","Ativar o botão de WhatsApp no perfil"],
- ["atributos","Atributos preenchidos (pagamento, acessibilidade…)","Cadastro",2,"9049526","Preencher os atributos da categoria"],
  ["servicos","Serviços cadastrados com descrição","Cadastro",3,"9455399","Cadastrar cada serviço com descrição (aparece nas buscas pelo serviço)"],
- ["logo","Tem logotipo","Fotos",2,"16335217","Adicionar o logotipo"],
- ["capa","Tem foto de capa","Fotos",2,"16335217","Escolher uma foto de capa"],
+ ["logo","Tem logotipo","Fotos",1,"16335217","Adicionar o logotipo"],
+ ["capa","Tem foto de capa","Fotos",1,"16335217","Escolher uma foto de capa"],
  ["fotoRecente","Subiu foto nos últimos 30 dias","Fotos",4,"10515606","Subir fotos novas todo mês (o Google liga isso à classificação)"],
  ["nap","Nome, telefone e endereço do site iguais aos do Google","Web",3,"4454429","Deixar nome, telefone e endereço idênticos no site e no Google"],
- ["redes","Redes sociais vinculadas no perfil","Web",2,"13580646","Vincular Instagram e Facebook no perfil"],
- ["descricao","Descrição preenchida, sem link/preço/promoção","Conteúdo",5,"3039617","Escrever a descrição: o que faz, diferencial e há quanto tempo existe (até 750 caracteres, sem link nem preço)"],
+ ["redes","Redes sociais vinculadas no perfil","Web",1,"13580646","Vincular Instagram e Facebook no perfil"],
+ ["descricao","Descrição preenchida, sem link/preço/promoção","Conteúdo",6,"3039617","Escrever a descrição: o que faz, diferencial e há quanto tempo existe (até 750 caracteres, sem link nem preço)"],
 ];
-function montarManuais(){
-  $("manuais").innerHTML=MANUAIS.map(m=>`<label class="chk"><input type="checkbox" id="m_${m[0]}"> ${m[1]} <span class="pts">(${m[3]} pts)</span></label>`).join("");
-  MANUAIS.forEach(m=>$("m_"+m[0]).onchange=e=>{D.manual[m[0]]=e.target.checked;render()});
-}
+function montarManuais(){}
+function marcar(k,v){ D.manual[k]=v; render(); }
+const FAIXAS=[[0,24,"Ruim","#ff7b6b","Seu perfil está perdendo cliente pra concorrência todo dia."],[25,59,"Regular","#f0b54a","Tem o básico, mas fica atrás de quem cuida do perfil."],[60,84,"Bom","#FFD053","Bem cuidado, com pontos claros pra subir."],[85,99,"Muito bom","#5cc884","Acima da média. Agora é manter e ajustar detalhes."],[100,100,"Excelente","#FFD053","Perfil completo pela régua do Google."]];
+// Explicação de cada ação, pra leigo (o que é / por que / onde / ideias)
+const EXPL=[
+ [/serviço com descrição/i,{q:"Cada serviço cadastrado pode fazer você aparecer quando alguém busca por ele.",o:"Perfil > Editar serviços."}],
+ [/categoria principal/i,{q:"É o que o Google entende que sua empresa é. Pesa muito na busca.",o:"Perfil > Editar perfil > Categoria da empresa."}],
+ [/categorias secundárias/i,{q:"Outras coisas que a empresa também é (não o que vende). Fazem você aparecer em mais buscas.",o:"Perfil > Editar perfil > Categoria da empresa > Adicionar outra."}],
+ [/separador|nome para o usado/i,{q:"O nome no Google tem que ser igual ao da fachada. Palavra-chave enfiada no nome pode suspender o perfil."}],
+ [/endereço oficial/i,{o:"Perfil > Editar perfil > Localização."}],
+ [/horário normal/i,{o:"Perfil > Editar perfil > Horário."}],
+ [/horário dos próximos feriados/i,{q:"Sem o horário do feriado, o Google avisa \"o horário pode ser afetado\" e o cliente fica na dúvida se você abre.",o:"Perfil > Editar perfil > Horário > Horário especial."}],
+ [/telefone local/i,{o:"Perfil > Editar perfil > Contato."}],
+ [/volume de avaliações|pedir avaliação/i,{q:"Quantidade e nota das avaliações estão entre o que mais pesa na posição do mapa.",o:"Perfil > Pedir avaliações (gera o link). Mande pra todo cliente, sem brinde e sem escolher só os satisfeitos."}],
+ [/avaliações entrando todo mês/i,{q:"Avaliação recente mostra que a empresa está ativa. Avaliação parada há meses pesa contra."}],
+ [/responder as avaliações/i,{q:"Responder mostra cuidado pro próximo cliente. Negativa sem resposta assusta quem está decidindo.",o:"Perfil > Avaliações > Responder."}],
+ [/3 fotos de cada/i,{q:"Perfil com foto real de fachada, ambiente e equipe passa confiança e recebe mais cliques.",o:"Perfil > Adicionar fotos."}],
+ [/fotos novas todo mês/i,{q:"Foto é a galeria do perfil (fachada, ambiente, serviço). O Google liga fotos recentes à posição no mapa.",o:"Perfil > Adicionar fotos.",i:"Fachada, equipe trabalhando, um serviço feito, o ambiente arrumado."}],
+ [/logotipo/i,{q:"O logotipo aparece ao lado do nome e ajuda o cliente a reconhecer a marca.",o:"Perfil > Adicionar fotos > Logotipo."}],
+ [/foto de capa/i,{q:"É a primeira imagem que aparece no perfil. Se você não escolher, o Google escolhe (às vezes uma foto ruim de cliente).",o:"Perfil > Adicionar fotos > Capa."}],
+ [/site próprio|trocar o link/i,{q:"Link de rede social ou formulário no lugar do site é fora da regra e passa menos confiança.",o:"Perfil > Editar perfil > Contato > Site."}],
+ [/idênticos no site/i,{q:"Quando nome, telefone e endereço batem no site e no Google, o Google confia mais nos seus dados."}],
+ [/vincular instagram/i,{o:"Perfil > Editar perfil > Contato > Perfis sociais."}],
+ [/descrição/i,{q:"É o texto \"Da empresa\" do perfil. Conta o que você faz e seu diferencial.",o:"Perfil > Editar perfil > Descrição.",i:"O que faz, pra quem, diferencial e há quanto tempo existe. Até 750 caracteres, sem link nem preço."}],
+ [/postar/i,{q:"Postagem é uma novidade que aparece no seu perfil: oferta, evento, serviço em destaque. É diferente da foto, que fica na galeria. Postagem com mais de 6 meses é arquivada.",o:"Perfil > Adicionar atualização.",i:"Um serviço que você faz, um antes e depois, uma data especial, uma dúvida comum dos clientes."}],
+ [/whatsapp/i,{q:"O botão deixa o cliente chamar direto do Google, sem procurar o número.",o:"Perfil > Editar perfil > Contato > WhatsApp."}],
+ [/atributos/i,{q:"São as etiquetas do perfil (formas de pagamento, acessibilidade, Wi-Fi...). Ajudam em buscas específicas.",o:"Perfil > Editar perfil > Mais."}],
+];
+function expl(a){ const e=EXPL.find(x=>x[0].test(a)); return e?e[1]:{}; }
 
 const GENERICAS=/^(empresa|loja|serviço|consultoria|comércio|estabelecimento)$/i;
 function calcular(){
@@ -238,7 +307,7 @@ function calcular(){
   const nota=+D.nota||0, qtd=+D.total_avaliacoes||0;
   add("Avaliações",`Nota média (${nota.toFixed(1)})`,qtd===0?0:nota>=4.7?10:nota>=4.5?8:nota>=4.2?5:nota>=4?2:0,10,"4454429","Aumentar o volume de avaliações de clientes satisfeitos");
   // Saúde do perfil: volume por régua fixa (a comparação com concorrentes fica no quadro de Concorrência)
-  add("Avaliações",`Quantidade de avaliações (${qtd})`,qtd>=50?10:qtd>=25?7:qtd>=10?4:qtd>=1?2:0,10,"4454429","Pedir avaliação a todo cliente com link/QR (sem brinde e sem filtrar só os satisfeitos)");
+  add("Avaliações",`Quantidade de avaliações (${qtd})`,qtd>=50?12:qtd>=25?8:qtd>=10?5:qtd>=1?2:0,12,"4454429","Pedir avaliação a todo cliente com link/QR (sem brinde e sem filtrar só os satisfeitos)");
   const av=D.avaliacoes||[]; const dA=av.length?diasDesde(av[0].data):null;
   add("Avaliações",dA==null?"Avaliações recentes (sem dados)":`Última avaliação há ${dA} dias`,dA==null?0:dA<=30?5:dA<=90?3:dA<=180?1:0,5,"3474122","Manter avaliações entrando todo mês");
   const neg=av.filter(r=>r.nota!=null&&r.nota<=3); const rec=av.slice(0,5);
@@ -254,20 +323,19 @@ function calcular(){
   add("Web",site?(naoProprio?"Site do perfil não é site próprio":"Site próprio no perfil"):"Sem site no perfil",site&&!naoProprio?5:0,5,"3038177",naoProprio?"Trocar o link (rede social/formulário) por um site próprio":"Colocar um site próprio no perfil");
   // Conteúdo
   const dP=D.posts&&D.posts.length?diasDesde(D.posts[0].data):null;
-  add("Conteúdo",dP==null?"Nenhum post encontrado":`Último post há ${dP} dias`,dP==null?0:dP<=30?5:dP<=90?3:dP<=180?1:0,5,"7342169","Postar pelo menos 1 vez por mês (post com 6+ meses é arquivado)");
+  add("Conteúdo",dP==null?"Nenhum post encontrado":`Último post há ${dP} dias`,dP==null?0:dP<=30?7:dP<=90?4:dP<=180?1:0,7,"7342169","Postar pelo menos 1 vez por mês (post com 6+ meses é arquivado)");
   // Itens que agora podem vir automáticos (quando há dado confiável); senão, ficam pra confirmar à mão
   const auto={};
   if(D.painel_ok){ const d=D.descricao||""; const ruim=/https?:\/\/|www\.|r\$\s?\d|\d+\s?%|desconto|promo/i.test(d)||d.length>750;
-    auto.descricao={pts:d.length>=80&&!ruim?5:d?2:0,item:d?(ruim?"Descrição fora da regra (link, preço ou promoção)":"Descrição \"Da empresa\" preenchida"):"Sem descrição \"Da empresa\""};
-    auto.redes={pts:(D.redes||[]).length?2:0,item:(D.redes||[]).length?"Redes no perfil: "+D.redes.map(r=>r.nome).join(", "):"Nenhuma rede social vinculada ao perfil"}; }
+    auto.descricao={pts:d.length>=80&&!ruim?6:d?2:0,item:d?(ruim?"Descrição fora da regra (link, preço ou promoção)":"Descrição \"Da empresa\" preenchida"):"Sem descrição \"Da empresa\""};
+    auto.redes={pts:(D.redes||[]).length?1:0,item:(D.redes||[]).length?"Redes no perfil: "+D.redes.map(r=>r.nome).join(", "):"Nenhuma rede social vinculada ao perfil"}; }
   if(D.site_check&&D.site_check.abre){ const s=D.site_check; auto.nap={pts:(s.telefone_no_site?2:0)+(s.nome_no_site?1:0),item:`No site: telefone ${s.telefone_no_site?"✓":"✗"} · nome ${s.nome_no_site?"✓":"✗"}`};
     if(!auto.redes||!auto.redes.pts){ if(s.instagram||s.facebook) auto.redes={pts:1,item:"Redes só no site (não vinculadas ao perfil)"} } }
-  if((D.atributos||[]).length) auto.atributos={pts:2,item:`Atributos encontrados (${D.atributos.length})`};
-  MANUAIS.forEach(m=>{ const a=auto[m[0]]; if(a){ const el=$("m_"+m[0]); const cheio=a.pts>=m[3];
-      if(cheio){ add(m[2],a.item,a.pts,m[3],m[4],m[5],true); if(el){el.checked=true;el.disabled=true;el.parentElement.title="Confirmado automaticamente pelo Google";} }
-      else { const manual=!!D.manual[m[0]]; add(m[2],a.item+(manual?" · confirmado à mão":""),manual?m[3]:a.pts,m[3],m[4],m[5],!manual);
-        if(el){el.disabled=false;el.checked=manual;el.parentElement.title="O Google não mostrou este item completo: marque se o perfil tem";} } }
-    else add(m[2],m[1],D.manual[m[0]]?m[3]:0,m[3],m[4],m[5],false); });
+  const feriadoSem=(D.horario||[]).some(o=>/pode afetar/i.test(String(Object.values(o)[0]||"")));
+  if(feriadoSem) auto.horarioEsp={pts:0,item:"O Google avisa que o feriado pode afetar o horário: horário especial não cadastrado",trava:true};
+  MANUAIS.forEach(m=>{ const a=auto[m[0]], mk=!!D.manual[m[0]];
+    if(a&&(a.pts>=m[3]||a.trava)) add(m[2],a.item,a.pts,m[3],m[4],m[5],true);
+    else { add(m[2],a?a.item:m[1],mk?m[3]:(a?a.pts:0),m[3],m[4],m[5],false); it[it.length-1].chave=m[0]; it[it.length-1].marcado=mk; it[it.length-1].rotulo=m[1]; } });
   // Alertas
   const al=[]; let teto=100; const A=(c,t,cap,f)=>{if(c){al.push({t,cap,f});teto=Math.min(teto,cap)}};
   A(D.nao_reivindicado,"Perfil não reivindicado: qualquer pessoa pode tentar assumir",50,"14509283");
@@ -305,15 +373,29 @@ function cor(p){return p&&p<=3?"#2f8a4f":p&&p<=10?"#e0a800":"#c0392b"}
 function render(){
   const r=calcular();
   $("total").textContent=r.total; $("ring").style.setProperty("--p",r.total);
-  $("titulo").textContent=D.nome+" · "+r.total+"/100";
-  $("leitura").textContent=r.total>=80?"Perfil forte. Ajustes finos pra ficar à frente.":r.total>=60?"Perfil razoável, com pontos claros pra subir.":r.total>=40?"Perfil fraco: perde clientes pra concorrência no mapa.":"Perfil abandonado ou em risco. Precisa de trabalho urgente.";
+  const fx=FAIXAS.find(x=>r.total>=x[0]&&r.total<=x[1]);
+  $("ring").style.background=`conic-gradient(${fx[3]} ${r.total}%,#555 0)`; $("total").style.color=fx[3];
+  $("rot").textContent=fx[2]; $("rot").style.background=fx[3]; $("rot").classList.toggle("ex",fx[2]==="Excelente");
+  $("titulo").textContent=D.nome; $("leitura").textContent=fx[4];
+  $("regua").innerHTML=FAIXAS.map(x=>`<span class="${x===fx?"on":""}" style="${x===fx?"background:"+x[3]:""}">${x[2]} ${x[0]===x[1]?x[0]:x[0]+"–"+x[1]}</span>`).join("");
+  const ganho=Math.round(Math.min(100,r.teto)-r.total); $("minitxt").textContent=ganho>0?`${fx[2]} · você pode ganhar até +${ganho} pontos no bloco 2`:fx[2];
   $("selo").innerHTML=seloConcorrencia();
-  $("parcial").textContent=(r.pend?`${r.pend} pontos dependem de confirmação manual (quadro "Confirmar à mão"). `:"")+(r.teto<100&&r.soma>r.teto?`Somou ${r.soma}, travado em ${r.teto} por alerta.`:"");
+  $("parcial").textContent=(r.pend?`${r.pend} pontos dependem do que o Google não mostra: marque "Já tenho" no bloco 2. `:"")+(r.teto<100&&r.soma>r.teto?`Somou ${r.soma}, travado em ${r.teto} por alerta.`:"");
   const ord=["Cadastro","Avaliações","Fotos","Web","Conteúdo"], nm={Cadastro:"Cadastro e relevância",Avaliações:"Avaliações",Fotos:"Fotos e vídeos",Web:"Presença na web",Conteúdo:"Conteúdo"};
   $("blocos").innerHTML=ord.map(b=>{const x=r.it.filter(i=>i.bloco===b),p=x.reduce((s,i)=>s+i.pts,0),m=x.reduce((s,i)=>s+i.max,0);return `<div class="bloco"><span>${nm[b]}</span><span class="v">${Math.round(p)}/${m}</span><span class="bar"><i style="width:${p/m*100}%"></i></span></div>`}).join("");
-  $("alertas").innerHTML=r.al.length?r.al.map(a=>`<li>${a.cap?`<span class="pill p-bad">teto ${a.cap}</span>`:`<span class="pill p-warn">atenção</span>`}<span>${a.t} <a class="src" target="_blank" rel="noopener" href="${G(a.f)}">fonte</a></span><span></span></li>`).join(""):`<li><span class="pill p-ok">ok</span><span>Nenhum alerta encontrado.</span><span></span></li>`;
-  const f=r.it.filter(i=>i.pts<i.max).sort((a,b)=>(b.max-b.pts)-(a.max-a.pts));
-  $("acoes").innerHTML=f.map(i=>{const g=i.max-i.pts,c=g>=5?"p-bad":g>=2?"p-warn":"p-ok";return `<li><span class="pill ${c}">+${Math.round(g)}</span><span>${esc(i.acao)}<br><span class="src">${esc(i.item)}${i.auto?"":" · confirmar à mão"} · <a target="_blank" rel="noopener" href="${G(i.fonte)}">Central do Google</a></span></span><span class="pts">${Math.round(i.pts)}/${i.max}</span></li>`}).join("")||"<li>Tudo no máximo.</li>";
+  $("alertas").innerHTML=r.al.length?r.al.map(a=>`<div class="alerta"><b>${a.cap?`Isso trava sua nota em ${a.cap}. `:""}</b>${esc(a.t)} <a target="_blank" rel="noopener" href="${G(a.f)}">Ver regra do Google</a></div>`).join(""):`<div class="alerta ok">Nenhum risco de suspensão encontrado.</div>`;
+  const f=r.it.filter(i=>i.pts<i.max||i.marcado).sort((a,b)=>((!!a.marcado)-(!!b.marcado))||((b.max-b.pts)-(a.max-a.pts)));
+  const card=i=>{const g=Math.round(i.max-i.pts),c=g>=5?"p-bad":g>=2?"p-warn":"p-ok",e=expl(i.acao);
+    return `<div class="acao${i.marcado?" feito":""}"><div class="t">${i.marcado?'<span class="pill p-ok">feito</span>':`<span class="pill ${c}">+${g} ${g===1?"ponto":"pontos"}</span>`}<b>${esc(i.acao)}</b></div>
+    ${e.q||e.o||e.i?`<dl>${e.q?`<dt>Por quê</dt><dd>${esc(e.q)}</dd>`:""}${e.o?`<dt>Onde</dt><dd>${esc(e.o)}</dd>`:""}${e.i?`<dt>Ideias</dt><dd>${esc(e.i)}</dd>`:""}</dl>`:""}
+    ${i.chave?`<label class="ja"><input type="checkbox" ${i.marcado?"checked":""} onchange="marcar('${i.chave}',this.checked)"> Já tenho: ${esc(i.rotulo.charAt(0).toLowerCase()+i.rotulo.slice(1))}</label>`:""}
+    <span class="src">${i.chave?"O Google não mostra isso publicamente":"Hoje: "+esc(i.item)} · <a target="_blank" rel="noopener" href="${G(i.fonte)}">Central de Ajuda do Google</a></span></div>`};
+  // O texto das ações pagas NÃO vai pro navegador do lead: só o tamanho do ganho
+  const travado=g=>`<div class="acao blur" aria-hidden="true"><div class="t"><span class="pill p-bad">+${g} ${g===1?"ponto":"pontos"}</span><b>Ação recomendada pro seu perfil</b></div><dl><dt>Por quê</dt><dd>Explicação do impacto desta ação na sua posição no mapa e no que o cliente vê.</dd><dt>Onde</dt><dd>Passo a passo de onde fazer no seu perfil.</dd></dl></div>`;
+  const gratis=f.filter(i=>i.chave), pagas=f.filter(i=>!i.chave);
+  const ptsPagos=Math.round(pagas.reduce((t,i)=>t+i.max-i.pts,0));
+  $("acoes").innerHTML=(gratis.length?`<div class="grupo" style="margin-top:0">Rápidas: marque o que já tem e veja a nota subir</div>`+gratis.map(card).join(""):"")+
+    (pagas.length?`<div class="grupo">Plano completo · ${pagas.length} ações · até +${ptsPagos} pontos</div>`+(ADM||PAGO?pagas.map(card).join(""):`<div class="cofre">${pagas.map(i=>travado(Math.round(i.max-i.pts))).join("")}<div class="cta"><b>Seu plano completo tem ${pagas.length} ações que valem até +${ptsPagos} pontos.</b><span>São as que mais mexem na sua posição no mapa: avaliações, postagens, categorias e descrição.</span><button type="button" onclick="$('pagar').hidden=false">Liberar diagnóstico completo</button></div></div>`):"")||'<div class="alerta ok">Tudo no máximo.</div>';
   // mapa (local) ou ranking Brasil (e-commerce)
   const N=D.nacional;
   $("mapa").hidden=!!N; $("legMapa").hidden=!!N; $("nacional").hidden=!N;
