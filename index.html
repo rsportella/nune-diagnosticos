@@ -198,14 +198,17 @@ let D=null, mapa=null;
 let PAGO=false;
 
 async function api(params){
-  const q=new URLSearchParams({...params,adm:ADM});
-  const r=await fetch("api.php?"+q); const j=await r.json().catch(()=>({erro:"Resposta inválida do servidor."}));
+  // POST: dados do lead e chaves não vão na URL (nem nos logs do servidor)
+  const corpo=new URLSearchParams({...params,adm:ADM,k:ACESSO});
+  const r=await fetch("api.php",{method:"POST",body:corpo}); const j=await r.json().catch(()=>({erro:"Resposta inválida do servidor."}));
   if(!r.ok||j.erro) throw new Error(j.erro||"Erro "+r.status); return j;
 }
 
 let LID=""; try{LID=sessionStorage.getItem("jn_lid")||""}catch(e){}
 // Link de administrador: ?adm=CHAVE (fica salvo neste navegador)
 let ADM=""; try{ const u=new URLSearchParams(location.search).get("adm"); if(u){localStorage.setItem("jn_adm",u); history.replaceState(null,"",location.pathname)} ADM=localStorage.getItem("jn_adm")||""; }catch(e){}
+// Código de acesso opcional (config/acesso.txt): link com ?k=CODIGO, guardado nesta sessão
+let ACESSO=""; try{ const k=new URLSearchParams(location.search).get("k"); if(k){sessionStorage.setItem("jn_k",k); history.replaceState(null,"",location.pathname)} ACESSO=sessionStorage.getItem("jn_k")||""; }catch(e){}
 if(ADM){ LID="admin"; }
 function irParaBusca(nome){ $("fLead").hidden=true; $("fBusca").hidden=false; $("mBusca").hidden=false; $("ola").textContent=nome?`Olá, ${nome.split(" ")[0]}! Agora digite o nome da empresa e a cidade.`:"Digite o nome da empresa e a cidade."; $("nome").focus(); }
 if(ADM){ irParaBusca(""); $("ola").textContent="Modo administrador (JN): diagnóstico liberado para qualquer empresa."; }
@@ -240,7 +243,7 @@ async function diagnosticar(c,btn){
   btn.disabled=true; btn.textContent="Analisando… (até 1 min)";
   try{
     D=await api({acao:"diagnostico",data_id:c.data_id,lat:c.lat,lng:c.lng,palavra:$("palavra").value,lid:LID,titulo:c.titulo,cidade:$("cidade").value,ecommerce:$("ecom").checked?"1":"0"});
-    D.manual={}; montarManuais(); render(); $("laudo").hidden=false; if(mapa) setTimeout(()=>{mapa.invalidateSize();mapa.setView([D.lat,D.lng],13)},200); $("laudo").scrollIntoView({behavior:"smooth"});
+    D.manual={}; montarManuais(); render(); $("laudo").hidden=false; if(mapa&&!D.nacional) setTimeout(()=>{mapa.invalidateSize();mapa.setView([D.lat,D.lng],13)},200); $("laudo").scrollIntoView({behavior:"smooth"});
   }catch(err){alert(err.message)}finally{btn.disabled=false;btn.textContent="Diagnosticar"}
 }
 
@@ -346,7 +349,7 @@ function calcular(){
   const datas=av.map(r=>r.data).filter(Boolean).sort(); let pico=false;
   for(let i=0;i+4<datas.length;i++){ if((new Date(datas[i+4])-new Date(datas[i]))/864e5<=7) pico=true }
   if(pico) al.push({t:"5 ou mais avaliações em 7 dias. Tudo bem se vieram de clientes reais; o Google só pune incentivo (brinde, desconto) ou avaliação falsa",cap:null,f:"7400114"});
-  if(D.centro_por_cidade) al.push({t:`Endereço oculto (atende por área de cobertura): o mapa foi centralizado em ${D.cidade}`,cap:null,f:"3038163"});
+  if(D.centro_por_cidade) al.push({t:`Endereço oculto (atende por área de cobertura): o mapa foi centralizado em ${esc(D.cidade)}`,cap:null,f:"3038163"});
   const soma=it.reduce((s,i)=>s+i.pts,0); const pend=it.filter(i=>!i.auto&&!i.pts).reduce((s,i)=>s+i.max,0);
   return {it,al,teto,soma:Math.round(soma),total:Math.round(Math.min(soma,teto)),pend};
 }
